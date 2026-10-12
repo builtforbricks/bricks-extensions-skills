@@ -42,13 +42,14 @@ and the export token.
 | `bricks-extensions/export-status` | `run_id` | Read-only. The run's status, counters, last warnings and log lines, the verify result, the archive and the release, with `download_url` (the ZIP's address for a signed-in administrator). |
 | `bricks-extensions/runs-list` | none | Read-only. The remembered runs, newest first, and the run in progress (`current`). |
 
-**The worker rule.** `export-start` measures once how many PHP workers are free and stores it in the run. When
-fewer than two were free, `export-step` refuses with `bxt_no_free_workers`: "This server has fewer than two free PHP
-workers, so an export driven through abilities would wait on itself. Run it from Static Export in WordPress, or with
-wp bricks-extensions export." The request your call arrives in holds one worker itself, so a host with one or two
-workers always refuses. A run an ability started is cancelled at that refusal, so it does not block the next export;
-a run started elsewhere is left as it was. Say so to the owner and point at the two routes the sentence names; do not
-retry. Drive only the run your own `export-start` answered: never call `export-step` on a run the owner started.
+**The worker rule.** `export-start` first measures how many PHP workers are free (about two seconds). When fewer
+than two are free it refuses with `bxt_no_free_workers` before any run exists: "This server has fewer than two free
+PHP workers, so an export driven through abilities would wait on itself. Run it from Static Export in WordPress, or
+with wp bricks-extensions export." The request your call arrives in holds one worker itself, so a host with one or two
+workers always refuses. The measurement is stored in the run; `export-step` refuses with the same code when it finds
+fewer than two there, and then cancels a run an ability started so it does not block the next export. Say so to the
+owner and point at the two routes the sentence names; do not retry. Drive only the run your own `export-start`
+answered: never call `export-step` on a run the owner started.
 
 ## Workflow
 
