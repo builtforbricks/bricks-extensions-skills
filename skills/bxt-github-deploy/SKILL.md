@@ -37,6 +37,9 @@ field is disabled.
 After the archive is built, the push runs in steps:
 
 - It lists the branch's files once and uploads only the files that are new or changed under the folder.
+- The files travel the way `git push` sends them: one request for most sites, packs of about 8 MB for a large one,
+  parked on the temporary ref `refs/bxt/export-<run id>` until the last request moves the branch and removes it. No
+  REST request per file, so GitHub's limit on content-creating requests (500 an hour) does not stop a large first push.
 - One commit, "Static export <date>, <n> pages" (a page re-export names the page), then the branch moves forward.
   **Never a force-push.** If the branch moved while the export ran, the run fails with a sentence that says to export
   again; nothing is overwritten.
@@ -48,6 +51,7 @@ After the archive is built, the push runs in steps:
 - Files outside the folder are never touched.
 - A file above 100 MB is skipped with a warning (GitHub refuses it).
 - Rate limits and server errors make the step wait and try again; a refused token stops the run at once.
+- **Test connection** checks the repository, the branch and git's push address with the token.
 - An empty repository is fine: the first export creates the branch. A missing branch in a repository that has
   commits is refused: create it on GitHub first.
 
