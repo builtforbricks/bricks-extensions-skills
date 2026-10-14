@@ -1,6 +1,6 @@
 ---
 name: bxt-breakpoint-canvas
-description: "Use when the owner asks about Bricks Extensions Breakpoint Canvas, the builder mode that shows every breakpoint of the page side by side: how to open it (the toolbar button, Shift+B), what the read-only mirrors show and leave out, click-to-select, the bar, the Defaults (bxt_canvas), the Bricks line, and what is not built yet."
+description: "Use when the owner asks about Bricks Extensions Breakpoint Canvas, the builder mode that shows every breakpoint of the page side by side: how to open it (the toolbar button, Shift+B), what the read-only mirrors show and leave out, click-to-select, the Overview board (pan and zoom), the bar, the Defaults (bxt_canvas), the Bricks line, and what is not built yet."
 ---
 
 # Breakpoint Canvas
@@ -18,8 +18,9 @@ it was.
 ## What it shows
 
 - Bricks' own canvas stays where it is and keeps working; Bricks' breakpoint switch and its Styles popup too.
-- Under it, one **mirror** per non-base breakpoint that is switched on, each sized to the widest viewport where that
-  breakpoint's rules apply, with a label (name and width), scaled to fit.
+- Under it, one **mirror** per non-base breakpoint that is switched on, with a label (name and width), scaled to fit.
+  On a desktop-first site each mirror is as wide as the widest viewport where its breakpoint's rules apply; on a
+  mobile-first site, as wide as Bricks itself previews that breakpoint.
 - Mirrors refresh as you type: a changed element is replaced in every mirror; other changes trigger a short full
   refresh ("Refreshing the previews").
 - **Click an element in a mirror to select it** in Bricks: the canvas highlights and scrolls to it and the panel opens
@@ -34,11 +35,30 @@ it was.
 - Not the front end: they show what the builder canvas renders, without the builder's own styles and outlines.
 - Nothing is saved from the canvas mode.
 
+## Overview
+
+The third layout, **Overview**, lays every breakpoint shown plus the base one side by side as page-tall frames on a
+board, widest first, each labelled with its name and width. The real canvas stays loaded behind the board.
+
+- Pan: scroll or two-finger scroll (Shift with a mouse wheel moves sideways), or drag the empty board, drag with the
+  middle button, or hold Space and drag. Zoom around the pointer: Ctrl or Cmd and scroll, or pinch (10% to 200%).
+- Shift+1 fits every frame, Shift+2 shows the selected element, Shift+0 is 100%; `+`, `-` and the arrow keys with the
+  board focused; a double-click on a frame's label zooms to that frame. The keys never act while typing in a field
+  and never take Ctrl or Cmd with `+`, `-` or `0` (the browser's zoom).
+- Click an element in a frame to select it: Bricks also switches to that frame's breakpoint (the label shows
+  "Editing"), so the next edit in Bricks' panels applies there, and every frame follows.
+- Typing, dragging and Bricks' right-click menu inside a frame are not available: use Row or Grid, where the canvas is
+  in view. Editing inside the frames is planned for 1.1, behind a switch.
+- Viewport-height units (`vh`) in a frame are measured against 900 px, so a page-tall frame does not grow with them.
+
 ## The bar
 
-Above the mirrors: Layout (Row, one row that scrolls sideways; Grid, wraps onto rows), Size (Fit width, or Fixed
-zoom with Zoom), Synced scroll (scrolling the canvas scrolls every mirror to the same place), Labels, one toggle per
-breakpoint, and Close. The bar's choices are kept for this browser only.
+Above the mirrors: Layout (Row, one row that scrolls sideways; Grid, wraps onto rows; Overview), Size (Fit width, or
+Fixed zoom with Zoom), Synced scroll (scrolling the canvas scrolls every mirror to the same place), Labels, one toggle
+per breakpoint, and Close. In Overview the bar holds the layout, the zoom (out, the value that resets to 100%, in,
+Fit), the breakpoint toggles, a help button and Close. The bar wraps onto more rows in a narrow window. The bar's
+choices are kept for this browser only. While Bricks' preview mode is on, the bar and the mirrors or board step aside
+so the page gets the whole canvas.
 
 ## The defaults
 
@@ -47,10 +67,10 @@ breakpoint, and Close. The bar's choices are kept for this browser only.
 | Label | Key | Default |
 |---|---|---|
 | Breakpoints shown | `breakpoints` | all (with every breakpoint off, all of them open) |
-| Layout | `layout` | row |
+| Layout | `layout` | row (or `grid`, `overview`) |
 | Size | `fit` | fit the stage width (`width`), or `scale` for Fixed zoom |
 | Fixed zoom | `scale` | 0.5, from 0.2 to 1 |
-| Frame height | `frame_height` | 900 px, from 400 to 3000; the page scrolls inside it |
+| Frame height | `frame_height` | 900 px, from 400 to 3000; the page scrolls inside it (Row and Grid; Overview frames are as tall as the page) |
 | Synced scroll | `sync_scroll` | on |
 | Labels | `show_labels` | on |
 | Editable canvases | `editable` | off, disabled: "Arrives in 1.1." |
@@ -64,5 +84,7 @@ have verified." and the mode does not open, rather than break the builder.
 
 ## Not measured
 
-Safari and Firefox, sites built mobile-first, builder windows narrower than 1440 px, right-to-left sites, dragging
-into the canvas while the mode is open, Bricks' preview mode while open, and memory over a long session.
+Safari and Firefox (no driver; pinch there is assumed to arrive as Chrome sends it), touch pinch, and memory over a
+long Overview session. Measured for the release candidate: builder windows of 1280 and 1366 px, right-to-left sites, mobile-first
+sites, dragging from the elements panel and in the structure while the mode is open, Bricks' preview mode, and memory
+over 30 minutes of edits in Row.

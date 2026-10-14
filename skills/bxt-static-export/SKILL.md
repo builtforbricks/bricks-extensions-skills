@@ -12,7 +12,7 @@ Destination, GitHub, Runs and Releases cards.
 
 1. **Preflight.** Every export runs it first; a blocker stops the start (`bxt_preflight_blocked`). See
    `bxt-preflight-findings`.
-2. **Discovery** lists the jobs from the database, not by following links (links are still followed as a safety net):
+2. **Discovery** lists the jobs from the database, not by following links:
    - published posts of public post types (not attachments, not Bricks templates); password-protected posts are left
      out and listed;
    - term archives with their pagination, post type archives, author and date archives (both on by default);
@@ -20,17 +20,28 @@ Destination, GitHub, Runs and Releases cards.
      when the site exposes sitemaps;
    - the pagination pages of every paginated loop in Bricks data; a loop in a template is expanded once per post the
      template applies to; a loop inside a component or global element is reported, not expanded;
-   - for load more and infinite scroll past 100 items, the extra pages under `/<page>/bxt/<loop>/<n>/`.
-   Left out: search results, login, `wp-admin`, the REST API, WooCommerce cart, checkout and account, drafts, and the
-   owner's **Leave out** patterns. `wp bricks-extensions discover` prints the job list.
-3. **Pages** are fetched in export mode: anonymously (no admin bar, no edit links), bypassing page caches, each answer
-   carrying the header `X-BXT-Export-Mode: 1`. A page without it is refused, because a cache or firewall that strips
-   the header would ship a live page.
+   - for load more and infinite scroll past 100 items, the extra pages under `/<page>/bxt/<loop>/<n>/`;
+   - on a multilingual site, every translation at its own language address (Polylang and plugins like it), or every
+     page once per language under the language's folder (TranslatePress); the preflight's `languages` row lists them.
+   Left out: search results, login, `wp-admin`, the REST API, WooCommerce cart, checkout and account with every
+   address under them, author archives of authors without a user, drafts, and the owner's **Leave out** patterns.
+   `wp bricks-extensions discover` prints the job list.
+3. **Pages** are fetched in export mode: anonymously (no admin bar, no edit links), each fetch carrying
+   `?bxt-nocache=<run id>` so page caches let it through and never keep it (WordPress never sees the argument).
+   Each page proves export mode by its answer headers or, when a host strips those, by a proof inside the page made
+   with the run's token. A stored copy from an earlier export is refused. When three pages in a row come back without
+   export mode, or a cache answers the export's fetches before the first page, the run stops with one sentence that
+   names the cause, instead of failing page after page.
+   **The link safety net:** after the listed pages, links on them to this site that no job covers (no query string,
+   not left out, not a file) are fetched too, at most 500 in two passes, and listed as found by link only.
+   A page or file larger than the host accepts in one request goes up in parts.
 4. **Rewriting.** Links to this site become relative, so the export works from any folder; `404.html` keeps
-   root-relative links; sitemaps, `robots.txt`, `canonical` and `og:url` use the destination base URL.
+   root-relative links; sitemaps, `robots.txt`, `canonical`, `hreflang` links and `og:url` use the destination base
+   URL.
 5. **Assets**: only the files the pages use are exported (images, `srcset`, CSS `url()` and `@import`, icon fonts,
    Bricks' CSS files), copied from disk or fetched.
-6. **Google Fonts** are copied into the export by default, so the static site never calls Google.
+6. **Google Fonts** are copied into the export by default, linked ones and ones a stylesheet imports, so the static
+   site never calls Google.
 7. **Verify** checks the tree: every internal link exists, every referenced file resolves, no reference to the
    WordPress site is left, every page carried the export header. Failures are listed, never rounded away.
 8. **The archive**, `site.zip`, is built in a fixed order with its sha256 recorded. For the GitHub target the push
@@ -52,6 +63,7 @@ Only while a page renders for the export; Bricks' theme files and settings are n
 | Relative dates | rendered once at export time, then they stand still |
 | WordPress runtime | `ajaxUrl`, REST URL and nonces blanked (kept only where a form sends to this WordPress site); REST discovery, oEmbed, feed links, emoji script and generator removed |
 | Forms | as each form's Static Export group says (`bxt-forms-routes`) |
+| WooCommerce | a catalogue: products, the shop and categories keep prices and descriptions; add-to-cart buttons and forms, quantity fields, the mini cart, the sort menu and the scripts that call the cart are removed; menu items to cart, checkout and account are left out |
 
 ## The options
 
@@ -83,7 +95,7 @@ A run is a folder under the uploads folder holding `run.json`, the tree and `sit
 20 runs (Started, Pages, Files, Size, Status, Check); the files of the newest N finished runs are kept (setting
 above), older ones keep only their summary. A run left for more than six hours cannot be resumed. On the screen a run
 in progress is resumed after a reload, or discarded. Delete removes a run with its files; a run in progress cannot be
-deleted.
+deleted, unless it is abandoned (not the current run, or silent for more than six hours): then Delete cancels it first.
 
 ## What the ZIP holds
 

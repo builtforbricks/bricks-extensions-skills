@@ -17,7 +17,7 @@ values in the element's settings, so they travel with the page and change throug
 |---|---|---|
 | Destination | `bxtExportRoute` | `origin`, "This WordPress site" (default) or `endpoint`, "Another service" |
 | Endpoint URL | `bxtExportEndpoint` | the service's address, http or https (Another service only) |
-| Encoding | `bxtExportEncoding` | `form`, "Form fields" (default) or `json`, "JSON" (Another service only) |
+| Encoding | `bxtExportEncoding` | `form`, "Form fields" (default) or `json`, "JSON" (Another service only); a form with a file field is always sent as form fields |
 | Field names | `bxtExportNames` | `simple`, "Simple keys (full_name)" from each label (default), or `labels`, "Labels as written" (Another service only). A field's own custom name, when set, is sent as is. |
 | Success message | `bxtExportSuccess` | empty: the form's own success message (Another service only) |
 | Error message | `bxtExportError` | default "Sorry, your message could not be sent. Please try again later." |
@@ -49,13 +49,16 @@ the live site: its actions (email, webhook, newsletter, create post, redirect), 
 The static page posts the fields to the Endpoint URL; WordPress is not involved and nothing is added to it.
 
 - Field names are simple keys (`full_name`) or the labels as written; a field's own custom name wins. Encoding is
-  form fields or JSON.
+  form fields or JSON. JSON cannot carry files: a form with a file field is sent as form fields (multipart) with the
+  file even when JSON is chosen. The builder says so under Encoding, and the preflight warns (`forms_json_file`).
 - The honeypot is renamed `_gotcha`; a filled honeypot shows the success message and sends nothing.
 - The form shows Bricks' own success and error markup and fires Bricks' form events. Without JavaScript it still
   posts to the endpoint as a plain form.
 - **Runs only what the service does**: Bricks' form actions do not run. Spam filtering beyond the honeypot is the
   service's job, and the captcha widget stays only when **My service verifies captcha tokens** is ticked.
-- `{{field}}` tokens in a success message cannot be filled on a static page.
+- `{{field}}` tokens in the success message are filled in the visitor's browser from the submitted values, as text
+  (a token for a field that does not exist is left empty). Tokens that Bricks fills when the page renders, such as
+  `{post_title}`, are filled at export time.
 
 ## Check forms
 
@@ -74,7 +77,15 @@ it from the static site. Check forms does not post to services.
    for the WordPress-site forms, save, and run Check forms.
 4. Re-export, then the owner submits each form once from the static site. Only that proves a route.
 
+## Where a form can sit
+
+Measured by the plugin's checks: a form in an AJAX popup (to this WordPress site) and in a static popup (to a
+service); forms inside a query loop on both routes (each item's form keeps its own success text); a form inside a
+component (to this WordPress site) and global-element forms on both routes (the preflight lists them too); file fields
+on both routes (to this WordPress site, Bricks saves the file; to a service, the service gets it).
+
 ## Not measured
 
-Forms inside loops, components, global elements or popups, file uploads, a page with one form on each route, and
-real captcha keys and real services were not measured by the plugin's checks. Say so when a form is one of these.
+Real services and real captcha keys (the plugin's checks post to a local receiver); a service-route form in an AJAX
+popup; popups inside a loop; a file field inside a loop or a component; more than one file per field; a service that
+refuses multipart; a host's upload size limit. Say so when a form is one of these.

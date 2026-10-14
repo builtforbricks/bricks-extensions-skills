@@ -23,19 +23,34 @@ the fix names.
 
 - **`permalinks`** (Permalinks). Every URL carries a query string, so the export cannot write one file per page.
   Fix: Choose a permalink structure under Settings > Permalinks, for example Post name.
-- **`header_probe`** (Export header round trip). The server fetches its own front page with an export token and
-  expects status 200 with the export header. Four wordings:
-  - The header did not come back: "A page cache or firewall strips the export header, so the export would ship live
-    pages with lazy placeholders and REST calls." Fix: Exclude the export from the page cache (the bypass cookie is
-    sent already), allow the admin IP in the firewall, or switch the cache off during the export.
+- **`header_probe`** (Export header round trip). The server fetches its own front page with an export token (and a
+  cookie page caches step aside for) and expects export mode; when it is missing, a second fetch asks past any cache.
+  The row's `probe.case` names what was seen. Blockers:
+  - Case `cache`: "A page cache answers even the export's fetches with stored copies (it ignores query strings and
+    cookies), so export mode never runs and the cache may keep export pages for visitors." Fix: Make the cache step
+    aside for requests that carry the X-BXT-Export header (on nginx: `fastcgi_cache_bypass $http_x_bxt_export;` and
+    `fastcgi_no_cache $http_x_bxt_export;`), or let it cache by query string, or switch it off during the export.
+  - Case `request`: "Export mode never ran: a firewall or proxy in front of the site removes the X-BXT-Export header
+    from requests, so the export would ship live pages with lazy placeholders and REST calls." Fix: Allow the
+    X-BXT-Export request header in the firewall or proxy (it carries a one-time token), or export from a copy of the
+    site that is not behind it.
   - Another status: "The front page answered <status> to the probe instead of 200." Fix: Make sure the site address
     answers directly, without a redirect, and that no firewall blocks requests from the server.
-  - A request error is a **warn**, not a blocker: "The server could not fetch its own front page (<error>). The export
-    from this screen is not affected: your browser fetches the pages. WP-CLI exports and agent abilities fetch from the
-    server and would fail." Fix: Nothing to do for exports from this screen. For WP-CLI, ask the host why the site
-    cannot reach itself; Site Health under Tools shows the loopback state.
-  - No token: "No export token could be issued, so export mode cannot be switched on for the fetch."
-  The browser export's own preflight skips this probe: it checks the header on every page it fetches instead.
+  - No token: "No export token could be issued, so export mode cannot be switched on for the fetch." Fix: Check that
+    the site can write options, then run the preflight again.
+
+  Not blockers:
+  - A request error is a **warn**: "The server could not fetch its own front page (<error>). The export from this
+    screen is not affected: your browser fetches the pages. WP-CLI exports and agent abilities fetch from the server
+    and would fail." Fix: Nothing to do for exports from this screen. For WP-CLI, ask the host why the site cannot
+    reach itself; Site Health under Tools shows the loopback state.
+  - Case `stripped`, **info**: "The host removes the export headers from answers. Each page carries its own proof of
+    export mode, so the export goes on." Fix: Nothing to do.
+  - Case `busted`, **info**: "A page cache answers ordinary requests to this site with stored copies. The export asks
+    for every page past the cache, so it is not affected, and the cache never keeps an export page." Fix: Nothing to do.
+
+  The browser export's own preflight skips this probe. Before the first page it checks that no cache answers its
+  fetches, and it stops with one sentence when three pages in a row come back without export mode.
 
 ## Warnings
 
@@ -63,8 +78,13 @@ the fix names.
   Remove the live search, or replace it with a search service that works from static pages.
 - **`search_forms`** (Search forms). The search form sends its query to WordPress; on the static site a search leads
   nowhere, so the form is left out. Fix: Remove the search form, or point it at an external search service.
-- **`woo`** (WooCommerce elements). Cart, checkout and account need WordPress; WooCommerce elements export as fixed
-  HTML with no working cart. Fix: Keep the shop on WordPress and exclude its pages from the export with a pattern.
+- **`woo_buying`** (Buying on the static site). "The static copy cannot sell: products, the shop and categories keep
+  their prices and descriptions, but add-to-cart buttons and forms, quantity fields, the mini cart and the sort menu are
+  removed, with the scripts that call the cart." Fix: Keep the shop on WordPress, or leave the shop out of the export
+  with patterns (the row lists them, such as `/shop/`, `/product/`).
+- **`woo`** (WooCommerce cart, checkout and account elements). These elements need a shopper's cart or account; on an
+  exported page they show an empty or broken state. Fix: Keep them on the cart, checkout and account pages, which the
+  export leaves out, or exclude the pages they are on.
 - **`login`** (Login and account forms). Login, registration and account forms cannot work on a static site. Fix:
   Remove them from exported pages, or exclude those pages.
 - **`popups_ajax_loop`** (AJAX popups inside loops). An AJAX popup opened from inside a loop is inlined once per item,
@@ -79,6 +99,10 @@ the fix names.
 - **`forms_endpoint_missing`** (Endpoint route without an address). These forms are set to send to another service but
   have no endpoint URL, so on the static site they have nowhere to send. Fix: Open the form in Bricks and paste the
   service's endpoint URL in the Static Export group, or set its destination to This WordPress site.
+- **`forms_json_file`** (JSON with a file field). "These forms send to a service as JSON but have a file field. JSON
+  cannot carry files, so the static page sends them as form fields (multipart) with the files instead; a service that
+  reads JSON only may refuse those submissions." Fix: Choose Form fields as the encoding in the form's Static Export
+  group, or remove the file field, then send one test submission with a file from the static site.
 - **`forms_no_origin`** (No static origin for forms). "<n> forms post to this WordPress site, but no static origin is
   set, so browsers on the static site cannot read the answers and the forms show an error." Fix: Enter the static
   site's origin under Destination (the base URL or a static origin), or set the forms to send to a service.
@@ -89,6 +113,17 @@ the fix names.
 
 ## Notes
 
+- **`woo_pages`** (WooCommerce cart, checkout and account). "These pages answer each shopper from WordPress, so the
+  export leaves them and every address under them out, and leaves menu items that lead to them out of the exported
+  pages." Each place names the page and its endpoints. Fix: Nothing to do. Link to the shop on the WordPress site if
+  shoppers still need these pages.
+- **`languages`** (Languages). One place per language with its address. Polylang (and plugins like it): "Each
+  translation is exported at its own language address, with its own archives and pagination; the language switcher
+  links stay inside the export." Fix: Nothing to do. TranslatePress: "Every page is exported once per language, under
+  that language's folder, with the translations TranslatePress has stored; a string without a translation stays in the
+  default language." (With automatic translation on, it adds that TranslatePress may send untranslated strings to its
+  translation service while the export renders each page.) Fix: Translate what should be translated in TranslatePress
+  before exporting.
 - **`comments`** (Comments). The comments area (form and the closed-comments line) is removed; existing comments are
   not exported. Fix: Nothing to do. Keep WordPress online if readers must still comment.
 - **`password_posts`** (Password-protected posts). Password-protected posts are left out of the export. Fix: Remove
