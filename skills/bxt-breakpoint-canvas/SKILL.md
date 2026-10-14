@@ -24,7 +24,8 @@ it was.
 - Mirrors refresh as you type: a changed element is replaced in every mirror; other changes trigger a short full
   refresh ("Refreshing the previews").
 - **Click an element in a mirror to select it** in Bricks: the canvas highlights and scrolls to it and the panel opens
-  it, so the next edit applies to it. Hovering outlines the element in the mirrors.
+  it, so the next edit applies to it. Hovering outlines the element in every mirror and shows its name in a tag at its
+  corner, in Bricks' own highlight colour, as Bricks does on its canvas.
 
 ## What the mirrors are not
 

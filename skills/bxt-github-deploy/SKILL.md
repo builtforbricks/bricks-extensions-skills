@@ -98,6 +98,6 @@ were given.
 
 ## Not measured
 
-At 1.0.0-rc.2 the push was measured against a local server that answers GitHub's API with real git repositories, not
+At 1.0.0-rc.3 the push was measured against a local server that answers GitHub's API with real git repositories, not
 against GitHub itself, and no host's build from the repository was measured. Say so if the owner asks whether a host
 publishes the result.
