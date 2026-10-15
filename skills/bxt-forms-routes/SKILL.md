@@ -32,10 +32,10 @@ The static page posts to this WordPress install's `admin-ajax.php`, and Bricks r
 the live site: its actions (email, webhook, newsletter, create post, redirect), the honeypot and the captcha check.
 
 - **Needs** WordPress online and publicly reachable at `/wp-admin/admin-ajax.php`, at the **WordPress address for
-  forms** (Destination card, `bxt_static_export.forms_origin_url`; this site by default; another address when the
+  forms** (Settings, Address and forms, `bxt_static_export.forms_origin_url`; this site by default; another address when the
   export is made from a staging copy). No password, access rule, redirect or IP allowlist on that address.
 - **Needs** the static site's origin, so WordPress accepts the post: the **Base URL**'s origin counts on its own;
-  other addresses go in **Static origins** (`bxt_static_export.static_origins`), one per line, exact origins such as
+  other addresses go in **More addresses the forms accept** (static origins, `bxt_static_export.static_origins`), one per line, exact origins such as
   `https://www.example.com` or one wildcard level such as `https://*.preview.example` for preview deploys. Only the two
   Bricks form actions answer those origins; nothing else on WordPress changes.
 - **Needs** a re-export after the form's fields change.

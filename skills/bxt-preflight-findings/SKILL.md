@@ -1,12 +1,13 @@
 ---
 name: bxt-preflight-findings
-description: "Use when reading or explaining a Bricks Extensions preflight report (the bricks-extensions/preflight ability, wp bricks-extensions preflight, or the Preflight card on the Static Export screen): every row id with its level, what it costs the static copy and the fix, in the plugin's own words."
+description: "Use when reading or explaining a Bricks Extensions preflight report (the bricks-extensions/preflight ability, wp bricks-extensions preflight, or step 1, Check the site, on the Static Export screen): every row id with its level, what it costs the static copy and the fix, in the plugin's own words."
 ---
 
 # Static Export: the preflight findings
 
 Read `bxt-start-here` first. The preflight lists what on this site cannot go static and how to fix it. Running it
-changes nothing; it stores the last report, which the Preflight card and the dashboard show. Every export runs it
+changes nothing; it stores the last report, which step 1, **Check the site**, and the dashboard show (the counts in view, the rows folded under
+**Show what the check found**, open by themselves when there is a blocker). Every export runs it
 first.
 
 Each row has an `id` (stable, use it), a `level`, the `feature`, `where` (the pages, templates or menus it was found
@@ -69,7 +70,7 @@ the fix names.
   and replace), so the export would carry old styles. Fix: Regenerate the CSS files.
 
   The three CSS rows appear only when Bricks loads its CSS as files, and carry the action **Regenerate CSS files** on
-  the Preflight card (`wp bricks-extensions regenerate-css`). It writes Bricks' CSS files with Bricks' own generator
+  step 1, Check the site (`wp bricks-extensions regenerate-css`). It writes Bricks' CSS files with Bricks' own generator
   and runs the preflight again; it refuses when the CSS loading method is inline.
 - **`filters`** (Query filters). Query filters need WordPress to answer; the export leaves them out and exports the
   loop unfiltered with plain pagination. Fix: Remove the filter elements from exported pages, or keep them and accept

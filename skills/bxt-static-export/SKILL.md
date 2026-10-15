@@ -5,8 +5,11 @@ description: "Use when exporting a Bricks site as static HTML with Bricks Extens
 
 # Static Export: how an export works
 
-Read `bxt-start-here` first. Static Export lives on **Bricks Extensions > Static Export**: the Preflight, Export,
-Destination, GitHub, Runs and Releases cards.
+Read `bxt-start-here` first. Static Export lives on **Bricks Extensions > Static Export**, in three tabs:
+**Export** holds the three steps in order (**1. Check the site**, the preflight; **2. Choose where it goes**, ZIP or
+GitHub and the address of the static site; **3. Export**, the run, its progress and the last export's ZIP, with
+**Update one page only** folded under it); **History** holds **Exports** (the runs) and, once GitHub is set up,
+**Releases**; **Settings** holds **What goes in** (the options), **Address and forms**, and **GitHub**.
 
 ## A run, step by step
 
@@ -69,30 +72,32 @@ Only while a page renders for the export; Bricks' theme files and settings are n
 
 Option `bxt_static_export`, saved from the screen:
 
-| Card, label | Key | Default |
+| Settings card, label | Key | Default |
 |---|---|---|
-| Export, Google Fonts local | `google_fonts_local` | on |
-| Export, Author archives | `include_author` | on |
-| Export, Date archives | `include_date` | on |
-| Export, Leave out (one path per line; a plain path leaves out that page and everything under it; `*` and `?` match like a shell pattern) | `exclude_patterns` | none |
-| Export, Parallel requests (pages fetched at once, 1 to 6) | `parallel` | 3 |
-| Export, Keep files of the last N runs (1 to 10) | `retention_runs` | 3 |
-| Destination, Base URL (where the static site will live) | `base_url` | none |
-| Destination, Static origins | `static_origins` | none |
-| Destination, WordPress address for forms | `forms_origin_url` | this site |
+| What goes in, Google Fonts local | `google_fonts_local` | on |
+| What goes in, Author archives | `include_author` | on |
+| What goes in, Date archives | `include_date` | on |
+| What goes in, Leave out (one path per line; a plain path leaves out that page and everything under it; `*` and `?` match like a shell pattern) | `exclude_patterns` | none |
+| What goes in, Parallel requests (pages fetched at once, 1 to 6) | `parallel` | 3 |
+| What goes in, Keep files of the last N runs (1 to 10) | `retention_runs` | 3 |
+| Address and forms, Address of the static site (the base URL) | `base_url` | none |
+| Address and forms, More addresses the forms accept (static origins) | `static_origins` | none |
+| Address and forms, WordPress address for forms | `forms_origin_url` | this site |
 
 Without a base URL, sitemaps and canonical links keep this site's address. Set it to the static site's address.
 
 ## Targets
 
-- **ZIP**: always available. Download ZIP on the Export card or the Runs card.
-- **GitHub**: available once a repository and a token are saved on the GitHub card; until then the picker shows it
-  disabled with its reason. See `bxt-github-deploy`.
+- **ZIP**: always available. **Download ZIP** under step 3 (the run's result, or the last export) or on History,
+  Exports. The link takes the screen's own address, so a site behind a proxy that ends HTTPS still downloads it. On a
+  plain `http://` site the browser warns about every download; the screen says so there and the owner chooses Keep.
+- **GitHub**: available once a repository and a token are saved under Settings, GitHub; until then step 2 shows it
+  disabled with its reason and a Set up GitHub link. See `bxt-github-deploy`.
 
 ## Runs and retention
 
-A run is a folder under the uploads folder holding `run.json`, the tree and `site.zip`. The Runs card lists the last
-20 runs (Started, Pages, Files, Size, Status, Check); the files of the newest N finished runs are kept (setting
+A run is a folder under the uploads folder holding `run.json`, the tree and `site.zip`. History, Exports lists the
+last 20 runs (Started, Pages, Size, Status, Check; the newest five in view, the rest folded); the files of the newest N finished runs are kept (setting
 above), older ones keep only their summary. A run left for more than six hours cannot be resumed. On the screen a run
 in progress is resumed after a reload, or discarded. Delete removes a run with its files; a run in progress cannot be
 deleted, unless it is abandoned (not the current run, or silent for more than six hours): then Delete cancels it first.
@@ -104,9 +109,13 @@ files the pages use at their WordPress paths, and localised Google Fonts under `
 `wp-config.php`, the theme folder, or any file no page referenced. A leaked export token exposes only what a visitor
 could already see.
 
+Every page carries one small script (`bxt-disk-links`): only when the page is opened as a file, a click on a folder
+link opens that folder's `index.html`, so an unzipped export can be looked at by opening `index.html`. On a host it does
+nothing. With Google Fonts local, a page that loads no Google stylesheet keeps no preconnect or dns-prefetch to Google.
+
 ## A page re-export
 
-Re-exports one page and the files it uses: the Releases card's **Re-export this page**, `export-start` with `only`,
+Re-exports one page and the files it uses: **Update one page only** under step 3 (**Re-export this page**), `export-start` with `only`,
 or `wp bricks-extensions export --only=<url>`. For ZIP, the archive is rebuilt from the last complete export with the
 page replaced; for GitHub, only that page's changed files are committed.
 

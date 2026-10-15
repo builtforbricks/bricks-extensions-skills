@@ -73,7 +73,7 @@ Then start a new chat and ask: *List the loaded skills whose names start with `b
 
 They never switch the abilities on for the owner, never touch the licence, and never push to GitHub, roll back a
 release or change the GitHub settings without the owner's word for that push. They never read, store or ask for the
-GitHub token in a chat: the owner pastes it on the GitHub card or pipes it to WP-CLI. They never present a static copy
+GitHub token in a chat: the owner pastes it under Settings, GitHub on the Static Export screen or pipes it to WP-CLI. They never present a static copy
 as tested: the owner checks the static site, and its forms, from the address it is served at.
 
 ## How it is made, and why that matters

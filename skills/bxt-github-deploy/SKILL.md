@@ -13,7 +13,8 @@ a chat, never read it, never store it.
 
 ## The GitHub card
 
-On **Bricks Extensions > Static Export**, beside Destination. Option `bxt_github`.
+On **Bricks Extensions > Static Export**, the **Settings** tab, beside Address and forms. Option `bxt_github`. The
+releases are under the **History** tab once GitHub is set up.
 
 | Label | Stored as | Notes |
 |---|---|---|
@@ -70,7 +71,7 @@ no commit.
 
 ## A page re-export
 
-**Re-export this page** under the Releases card (or `export-start` with `only`, or `wp bricks-extensions export
+**Re-export this page** under step 3's **Update one page only** (or `export-start` with `only`, or `wp bricks-extensions export
 --target=github --only=<url>`) re-renders one page and the files it uses and commits only what changed for it.
 
 ## WP-CLI
@@ -98,6 +99,6 @@ were given.
 
 ## Not measured
 
-At 1.0.0-rc.3 the push was measured against a local server that answers GitHub's API with real git repositories, not
+At 1.0.0-rc.5 the push was measured against a local server that answers GitHub's API with real git repositories, not
 against GitHub itself, and no host's build from the repository was measured. Say so if the owner asks whether a host
 publishes the result.

@@ -61,8 +61,8 @@ answered: never call `export-step` on a run the owner started.
 4. Exporting: the default is the owner's browser on **Bricks Extensions > Static Export** (works on any host). For a
    large site the owner runs `wp bricks-extensions export`. Through the abilities: `export-start`, then `export-step`
    until `done`, then `export-status`. Never start an export while the owner's own export is running.
-5. After an export, report the verify result and the warnings, and where the ZIP is (the Runs card on the Static
-   Export screen, Download ZIP). The owner checks the static site from the address it is served at; you cannot.
+5. After an export, report the verify result and the warnings, and where the ZIP is (Download ZIP under step 3 of the
+   Static Export screen, or History, Exports). The owner checks the static site from the address it is served at; you cannot.
 
 ## Forms, in one rule
 
