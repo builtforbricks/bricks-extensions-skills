@@ -1,11 +1,11 @@
 ---
-name: bxt-preflight-findings
-description: "Use when reading or explaining a Bricks Extensions preflight report (the bricks-extensions/preflight ability, wp bricks-extensions preflight, or step 1, Check the site, on the Static Export screen): every row id with its level, what it costs the static copy and the fix, in the plugin's own words."
+name: bse-preflight-findings
+description: "Use when reading or explaining a Bricks Static Export preflight report (the bricks-static-export/preflight ability, wp bricks-static-export preflight, or step 1, Check the site, on the Static Export screen): every row id with its level, what it costs the static copy and the fix, in the plugin's own words."
 ---
 
 # Static Export: the preflight findings
 
-Read `bxt-start-here` first. The preflight lists what on this site cannot go static and how to fix it. Running it
+Read `bse-start-here` first. The preflight lists what on this site cannot go static and how to fix it. Running it
 changes nothing; it stores the last report, which step 1, **Check the site**, and the dashboard show (the counts in view, the rows folded under
 **Show what the check found**, open by themselves when there is a blocker). Every export runs it
 first.
@@ -13,7 +13,7 @@ first.
 Each row has an `id` (stable, use it), a `level`, the `feature`, `where` (the pages, templates or menus it was found
 on), the `consequence` and the `fix`. Levels: **blocker** (the export will not start until it is fixed), **warn**
 (the export runs, but the static copy differs from the live site in a way the owner should decide on), **info** (a
-note: what the export does on its own). Blockers sort first. Through the `bricks-extensions/preflight` ability the
+note: what the export does on its own). Blockers sort first. Through the `bricks-static-export/preflight` ability the
 info level is called `note`, and `where` is text: the titles with their addresses, ten at most.
 
 Quote the consequence and the fix as the plugin words them. Propose a fix only in the plugin's terms below, and make
@@ -29,11 +29,11 @@ the fix names.
   The row's `probe.case` names what was seen. Blockers:
   - Case `cache`: "A page cache answers even the export's fetches with stored copies (it ignores query strings and
     cookies), so export mode never runs and the cache may keep export pages for visitors." Fix: Make the cache step
-    aside for requests that carry the X-BXT-Export header (on nginx: `fastcgi_cache_bypass $http_x_bxt_export;` and
-    `fastcgi_no_cache $http_x_bxt_export;`), or let it cache by query string, or switch it off during the export.
-  - Case `request`: "Export mode never ran: a firewall or proxy in front of the site removes the X-BXT-Export header
+    aside for requests that carry the X-BSE-Export header (on nginx: `fastcgi_cache_bypass $http_x_bse_export;` and
+    `fastcgi_no_cache $http_x_bse_export;`), or let it cache by query string, or switch it off during the export.
+  - Case `request`: "Export mode never ran: a firewall or proxy in front of the site removes the X-BSE-Export header
     from requests, so the export would ship live pages with lazy placeholders and REST calls." Fix: Allow the
-    X-BXT-Export request header in the firewall or proxy (it carries a one-time token), or export from a copy of the
+    X-BSE-Export request header in the firewall or proxy (it carries a one-time token), or export from a copy of the
     site that is not behind it.
   - Another status: "The front page answered <status> to the probe instead of 200." Fix: Make sure the site address
     answers directly, without a redirect, and that no firewall blocks requests from the server.
@@ -70,7 +70,7 @@ the fix names.
   and replace), so the export would carry old styles. Fix: Regenerate the CSS files.
 
   The three CSS rows appear only when Bricks loads its CSS as files, and carry the action **Regenerate CSS files** on
-  step 1, Check the site (`wp bricks-extensions regenerate-css`). It writes Bricks' CSS files with Bricks' own generator
+  step 1, Check the site (`wp bricks-static-export regenerate-css`). It writes Bricks' CSS files with Bricks' own generator
   and runs the preflight again; it refuses when the CSS loading method is inline.
 - **`filters`** (Query filters). Query filters need WordPress to answer; the export leaves them out and exports the
   loop unfiltered with plain pagination. Fix: Remove the filter elements from exported pages, or keep them and accept
@@ -153,7 +153,7 @@ the fix names.
 - **`forms`** (Forms). "<n> forms found. To this WordPress site: <a>. To a service: <b>." Each place names the form's
   route ("to this WordPress site", "to a service, <host>", "to a service, no address"). Fix: Each form's destination
   is chosen in the builder, in the form's Static Export group. Forms to this WordPress site need the static site's
-  origin under Destination; forms to a service need its endpoint URL. See `bxt-forms-routes`.
+  origin under Destination; forms to a service need its endpoint URL. See `bse-forms-routes`.
 - **`forms_reachability`** as a note: admin-ajax.php answered 400 or 200 from this server, as it should (visitors'
   browsers must reach the same address: no password, access rule or IP allowlist on it); or it could not be checked
   from the server, which on a host that runs one PHP worker does not mean visitors cannot reach it; or, during an

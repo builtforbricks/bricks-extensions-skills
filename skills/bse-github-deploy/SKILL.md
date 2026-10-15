@@ -1,11 +1,11 @@
 ---
-name: bxt-github-deploy
-description: "Use when a Bricks Extensions static export goes to GitHub: the GitHub card (repository, branch, folder, token, Tag every push), what the token needs, how a push commits only changed files and never force-pushes, the files it keeps, releases and roll back, a page re-export, and the WP-CLI github and releases commands."
+name: bse-github-deploy
+description: "Use when a Bricks Static Export static export goes to GitHub: the GitHub card (repository, branch, folder, token, Tag every push), what the token needs, how a push commits only changed files and never force-pushes, the files it keeps, releases and roll back, a page re-export, and the WP-CLI github and releases commands."
 ---
 
 # Static Export: the GitHub target
 
-Read `bxt-start-here` first. The GitHub target pushes each export to one branch of one repository as a single commit;
+Read `bse-start-here` first. The GitHub target pushes each export to one branch of one repository as a single commit;
 a host that builds from the repository publishes it from there. ZIP stays available for every run.
 
 **Every push, roll back and settings change needs the owner's word for that one action.** Never ask for the token in
@@ -13,7 +13,7 @@ a chat, never read it, never store it.
 
 ## The GitHub card
 
-On **Bricks Extensions > Static Export**, the **Settings** tab, beside Address and forms. Option `bxt_github`. The
+On **Bricks Static Export > Export**, the **Settings** tab, beside Address and forms. Option `bse_github`. The
 releases are under the **History** tab once GitHub is set up.
 
 | Label | Stored as | Notes |
@@ -39,7 +39,7 @@ After the archive is built, the push runs in steps:
 
 - It lists the branch's files once and uploads only the files that are new or changed under the folder.
 - The files travel the way `git push` sends them: one request for most sites, packs of about 8 MB for a large one,
-  parked on the temporary ref `refs/bxt/export-<run id>` until the last request moves the branch and removes it. No
+  parked on the temporary ref `refs/bse/export-<run id>` until the last request moves the branch and removes it. No
   REST request per file, so GitHub's limit on content-creating requests (500 an hour) does not stop a large first push.
 - One commit, "Static export <date>, <n> pages" (a page re-export names the page), then the branch moves forward.
   **Never a force-push.** If the branch moved while the export ran, the run fails with a sentence that says to export
@@ -61,7 +61,7 @@ prints a `release` row. A failed push keeps the ZIP.
 
 ## Releases and roll back
 
-The **Releases** card lists every push and every roll back, newest first (the last 50, option `bxt_releases`): When,
+The **Releases** card lists every push and every roll back, newest first (the last 50, option `bse_releases`): When,
 Kind (Export, Page, Roll back, "no change"), Pages, Commit, Tag, By.
 
 **Roll back** (on rows whose files differ from the newest) makes a new commit with the files of that earlier export,
@@ -71,31 +71,31 @@ no commit.
 
 ## A page re-export
 
-**Re-export this page** under step 3's **Update one page only** (or `export-start` with `only`, or `wp bricks-extensions export
+**Re-export this page** under step 3's **Update one page only** (or `export-start` with `only`, or `wp bricks-static-export export
 --target=github --only=<url>`) re-renders one page and the files it uses and commits only what changed for it.
 
 ## WP-CLI
 
 | Command | Does |
 |---|---|
-| `wp bricks-extensions github set [--repo=<repo>] [--branch=<branch>] [--folder=<folder>] [--tag\|--no-tag]` | saves the card's settings; options left out keep their value. `--folder`, because WP-CLI takes `--path` itself |
-| `wp bricks-extensions github set-token` | the token on STDIN, one line (`pbpaste \| wp bricks-extensions github set-token`); a `--token` argument is refused because it would stay in the shell history |
-| `wp bricks-extensions github remove-token` | removes the stored token |
-| `wp bricks-extensions github test [--format=table\|json]` | the repository, the push permission and the branch head |
-| `wp bricks-extensions export --target=github` | the export, then the push |
-| `wp bricks-extensions releases list [--format=table\|json]` | every push and roll back |
-| `wp bricks-extensions releases rollback <id>` | rolls the branch back to a release, as a new commit |
+| `wp bricks-static-export github set [--repo=<repo>] [--branch=<branch>] [--folder=<folder>] [--tag\|--no-tag]` | saves the card's settings; options left out keep their value. `--folder`, because WP-CLI takes `--path` itself |
+| `wp bricks-static-export github set-token` | the token on STDIN, one line (`pbpaste \| wp bricks-static-export github set-token`); a `--token` argument is refused because it would stay in the shell history |
+| `wp bricks-static-export github remove-token` | removes the stored token |
+| `wp bricks-static-export github test [--format=table\|json]` | the repository, the push permission and the branch head |
+| `wp bricks-static-export export --target=github` | the export, then the push |
+| `wp bricks-static-export releases list [--format=table\|json]` | every push and roll back |
+| `wp bricks-static-export releases rollback <id>` | rolls the branch back to a release, as a new commit |
 
 The owner runs `github set-token` in their own terminal. You may suggest the command; never run it with a token you
 were given.
 
 ## Errors worth knowing
 
-- "GitHub refused the token" (`bxt_github_unauthorized`): wrong, expired or revoked; the owner pastes a new one on the
+- "GitHub refused the token" (`bse_github_unauthorized`): wrong, expired or revoked; the owner pastes a new one on the
   card.
-- `bxt_github_no_push`: the token cannot write to this repository; it needs Contents: read and write on it.
-- `bxt_github_not_found`: the repository or the branch does not exist, or the token cannot see it.
-- `bxt_github_not_fast_forward`: the branch moved during the run; export again.
+- `bse_github_no_push`: the token cannot write to this repository; it needs Contents: read and write on it.
+- `bse_github_not_found`: the repository or the branch does not exist, or the token cannot see it.
+- `bse_github_not_fast_forward`: the branch moved during the run; export again.
 
 ## Not measured
 

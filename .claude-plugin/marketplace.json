@@ -1,27 +1,26 @@
 {
-    "name": "bricks-extensions-skills",
+    "name": "bricks-static-export-skills",
     "owner": {
         "name": "Built for Bricks",
         "url": "https://builtforbricks.com"
     },
     "metadata": {
-        "description": "Agent skills for Bricks Extensions, the Bricks Builder plugin by Built for Bricks: Static Export (the preflight, an export, forms on a static site, GitHub) and Breakpoint Canvas.",
+        "description": "Agent skills for Bricks Static Export, the Bricks Builder plugin by Built for Bricks: the preflight, an export, forms on a static site, GitHub.",
         "version": "0.1.0"
     },
     "plugins": [
         {
-            "name": "bricks-extensions",
-            "description": "Bricks Extensions skills for Bricks MCP clients: start-here, how an export works, every preflight finding, form routes, the GitHub target, the Breakpoint Canvas and the update check.",
+            "name": "bricks-static-export",
+            "description": "Bricks Static Export skills for Bricks MCP clients: start-here, how an export works, every preflight finding, form routes, the GitHub target and the update check.",
             "source": "./",
             "strict": false,
             "skills": [
-                "./skills/bxt-start-here",
-                "./skills/bxt-static-export",
-                "./skills/bxt-preflight-findings",
-                "./skills/bxt-forms-routes",
-                "./skills/bxt-github-deploy",
-                "./skills/bxt-breakpoint-canvas",
-                "./skills/bxt-update"
+                "./skills/bse-start-here",
+                "./skills/bse-static-export",
+                "./skills/bse-preflight-findings",
+                "./skills/bse-forms-routes",
+                "./skills/bse-github-deploy",
+                "./skills/bse-update"
             ]
         }
     ]
