@@ -6,7 +6,7 @@ plugin that has not shipped.
 
 ## 0.1.0, 2026-10-12
 
-Pre-release, verified up to Bricks Static Export 1.0.0-rc.5. It goes out with Bricks Static Export 1.0.0.
+Pre-release, verified up to Bricks Static Export 1.0.0-rc.6. It goes out with Bricks Static Export 1.0.0.
 
 - First pack: `bse-start-here`, `bse-static-export`, `bse-preflight-findings`, `bse-forms-routes`,
   `bse-github-deploy` and `bse-update`.
