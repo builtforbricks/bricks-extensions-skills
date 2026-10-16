@@ -1,6 +1,6 @@
 ---
 name: bse-static-export
-description: "Use when exporting a Bricks site as static HTML with Bricks Static Export, or explaining what an export does: export mode, which URLs are exported or left out, the export options and the destination, the ZIP and GitHub targets, runs and retention, what the ZIP holds, a page re-export, and the WP-CLI commands."
+description: "Use when exporting a Bricks site as static HTML with Bricks Static Export, or explaining what an export does: export mode, which URLs are exported or left out, the export options and the destination, the ZIP and GitHub targets, runs and retention, what the ZIP holds, site search, redirects, sitemaps, extra pages and files, updating a page from Bricks, and the WP-CLI commands."
 ---
 
 # Static Export: how an export works
@@ -19,8 +19,12 @@ GitHub and the address of the static site; **3. Export**, the run, its progress 
    - published posts of public post types (not attachments, not Bricks templates); password-protected posts are left
      out and listed;
    - term archives with their pagination, post type archives, author and date archives (both on by default);
-   - the front page, the posts page, a 404 page, `robots.txt`, `favicon.ico`, and `wp-sitemap.xml` with its children
-     when the site exposes sitemaps;
+   - the front page, the posts page, a 404 page, `robots.txt`, `favicon.ico`, and the sitemaps `robots.txt` announces:
+     an SEO plugin's index (Yoast SEO, Rank Math, SEOPress, All in One SEO, The SEO Framework) or WordPress' own
+     `wp-sitemap.xml`, each with its children and stylesheet;
+   - with site search on and a Search element on the site, the search results page (`/search/`, or `/site-search/`
+     when the site has a page at `/search/`);
+   - the owner's **Extra pages** (addresses nothing links to), marked `manual`;
    - the pagination pages of every paginated loop in Bricks data; a loop in a template is expanded once per post the
      template applies to; a loop inside a component or global element is reported, not expanded;
    - for load more and infinite scroll past 100 items, the extra pages under `/<page>/bse/<loop>/<n>/`;
@@ -37,15 +41,18 @@ GitHub and the address of the static site; **3. Export**, the run, its progress 
    names the cause, instead of failing page after page.
    **The link safety net:** after the listed pages, links on them to this site that no job covers (no query string,
    not left out, not a file) are fetched too, at most 500 in two passes, and listed as found by link only.
-   A page or file larger than the host accepts in one request goes up in parts.
+   A page or file larger than the host accepts in one request goes up in parts. A page WordPress answers with a redirect
+   (an archive an SEO plugin switched off, a moved page) is skipped, not failed.
 4. **Rewriting.** Links to this site become relative, so the export works from any folder; `404.html` keeps
    root-relative links; sitemaps, `robots.txt`, `canonical`, `hreflang` links and `og:url` use the destination base
    URL.
-5. **Assets**: only the files the pages use are exported (images, `srcset`, CSS `url()` and `@import`, icon fonts,
-   Bricks' CSS files), copied from disk or fetched.
+5. **Assets**: the files the pages use (images, `srcset`, CSS `url()` and `@import`, icon fonts, Bricks' CSS files),
+   copied from disk or fetched, and the owner's **Extra files** (copied from disk only). Then, before the check:
+   redirects (`_redirects` and redirect pages), sitemaps taken down to the pages the export has, and the search index,
+   in steps of a few seconds where it can be long.
 6. **Google Fonts** are copied into the export by default, linked ones and ones a stylesheet imports, so the static
    site never calls Google.
-7. **Verify** checks the tree: every internal link exists, every referenced file resolves, no reference to the
+7. **Verify** (in steps of about four seconds) checks the tree: every internal link exists, every referenced file resolves, no reference to the
    WordPress site is left, every page carried the export header. Failures are listed, never rounded away.
 8. **The archive**, `site.zip`, is built in a fixed order with its sha256 recorded. For the GitHub target the push
    follows (`bse-github-deploy`).
@@ -61,7 +68,8 @@ Only while a page renders for the export; Bricks' theme files and settings are n
 | AJAX pagination | plain links to pre-rendered pages |
 | Load more, infinite scroll | up to 100 items pre-rendered and revealed in batches by a small script; past that a "See all" link to separately exported pages |
 | AJAX popups | rendered into the page, so they open without a request |
-| Query filters, live search, search form | not rendered; the loop exports unfiltered with plain pagination |
+| Query filters, live search | not rendered; the loop exports unfiltered with plain pagination |
+| Search element | kept, with the static search script (site search on); left out when site search is off |
 | Comments | the whole comments area removed; existing comments are not exported |
 | Relative dates | rendered once at export time, then they stand still |
 | WordPress runtime | `ajaxUrl`, REST URL and nonces blanked (kept only where a form sends to this WordPress site); REST discovery, oEmbed, feed links, emoji script and generator removed |
@@ -77,7 +85,11 @@ Option `bse_static_export`, saved from the screen:
 | What goes in, Google Fonts local | `google_fonts_local` | on |
 | What goes in, Author archives | `include_author` | on |
 | What goes in, Date archives | `include_date` | on |
-| What goes in, Leave out (one path per line; a plain path leaves out that page and everything under it; `*` and `?` match like a shell pattern) | `exclude_patterns` | none |
+| What goes in, Site search | `search` | on |
+| What goes in, Redirects | `redirects` | on |
+| What goes in, Leave out (one path per line; a plain path leaves out that page and everything under it; `=/about/` that page only; `*` and `?` match like a shell pattern) | `exclude_patterns` | none |
+| What goes in, Extra pages (addresses of this site nothing links to) | `extra_pages` | none |
+| What goes in, Extra files (files or folders under the install: copied from disk; never PHP, dot files but `.well-known`, the runs folder; at most 5,000) | `extra_files` | none |
 | What goes in, Parallel requests (pages fetched at once, 1 to 6) | `parallel` | 3 |
 | What goes in, Keep files of the last N runs (1 to 10) | `retention_runs` | 3 |
 | Address and forms, Address of the static site (the base URL) | `base_url` | none |
@@ -85,6 +97,10 @@ Option `bse_static_export`, saved from the screen:
 | Address and forms, WordPress address for forms | `forms_origin_url` | this site |
 
 Without a base URL, sitemaps and canonical links keep this site's address. Set it to the static site's address.
+
+A page's own **Page settings → Static Export** in Bricks: **Leave this page out of the static export** (key
+`bseExportExclude`, an exact leave-out pattern for that page) and **Leave this page out of the site search**
+(`bseSearchExclude`, still exported).
 
 ## Targets
 
@@ -105,26 +121,59 @@ deleted, unless it is abandoned (not the current run, or silent for more than si
 ## What the ZIP holds
 
 Each page as `<path>/index.html`, `404.html` at the root, `robots.txt`, `favicon.ico`, the sitemaps when exposed, the
-files the pages use at their WordPress paths, and localised Google Fonts under `assets/fonts/google/`. It never holds
-`wp-config.php`, the theme folder, or any file no page referenced. A leaked export token exposes only what a visitor
+files the pages use at their WordPress paths, localised Google Fonts under `assets/fonts/google/`, and when they apply:
+`bse-search-index.js` and `search/index.html` (site search), `_redirects` and a redirect page at each old address,
+the owner's Extra files. It never holds `wp-config.php`, the theme folder, a PHP file, or any file no page referenced
+and the owner did not list.
+
+## Site search
+
+The Search element (plain or overlay; WordPress' own search form too) works on the static site: results as you type in
+a list under the field, Enter opens the results page with every match, twenty at a time. The index is built from the
+exported singular pages' main text (not archives, headers or footers), about 3 MB at most; accents and case are
+ignored, a `post_type` parameter on the element narrows the results, and on a site in several languages results follow
+the page's language. It works from a folder opened on disk too. Colours: the CSS variables `--bse-search-bg`, `-fg`,
+`-muted`, `-border`, `-hover`, `-mark`.
+
+## Redirects
+
+Redirection (enabled URL redirects), Rank Math (active; exact, starts with, a regex that is a plain prefix), Yoast
+Premium's stored redirects and WordPress' renamed slugs (`_wp_old_slug`) go into `_redirects` (the file several static
+hosts read) and, for every exact old address, a redirect page (any host, and from disk). What a static host cannot do
+(other patterns, contains or ends with, conditions, query strings, 410 or 404 answers) is listed in the preflight row
+`redirects` and the run's warnings, never approximated. A redirect page never replaces a page of the export.
+
+## Sitemaps
+
+The sitemaps `robots.txt` announces go in with the base URL; an entry whose page the export does not have is taken out,
+and a child sitemap left empty leaves the index. A leaked export token exposes only what a visitor
 could already see.
 
 Every page carries one small script (`bse-disk-links`): only when the page is opened as a file, a click on a folder
 link opens that folder's `index.html`, so an unzipped export can be looked at by opening `index.html`. On a host it does
 nothing. With Google Fonts local, a page that loads no Google stylesheet keeps no preconnect or dns-prefetch to Google.
 
-## A page re-export
+## Updating one page
 
-Re-exports one page and the files it uses: **Update one page only** under step 3 (**Re-export this page**), `export-start` with `only`,
-or `wp bricks-static-export export --only=<url>`. For ZIP, the archive is rebuilt from the last complete export with the
-page replaced; for GitHub, only that page's changed files are committed.
+Re-exports one page and the files it uses, into a copy of the last complete export:
+
+- **From Bricks**: **Update static site** in the builder's toolbar (just before Save) or in **Page settings → Static
+  Export** opens a small window over the builder; the page must be saved and published. Also **Update static site**
+  under a page's title in the Pages list and in the admin bar.
+- **On the screen**: **Update one page only** under step 3 (**Re-export this page**); `export-start` with `only`
+  (and `changed_only`); `wp bricks-static-export export --only=<url> [--changed-only]`.
+
+Where it goes, GitHub first: **GitHub: commit the changed files** (picked once GitHub is set up), **ZIP: changed files
+only** (just what the update changed, to unzip over the live copy; when nothing changed there is no ZIP and the screen
+says so), **ZIP: whole site** (the last export with the page replaced). The search index, `_redirects` and sitemaps
+are rebuilt from the whole tree, so they travel in the changed files when they changed.
 
 ## Where an export runs
 
 - **The owner's browser**, from Start export: the default, and it works on any host because PHP never waits on
   itself. The tab must stay open (Pause and Cancel are on the panel).
 - **WP-CLI**, server-side: `wp bricks-static-export export [--target=zip|github] [--parallel=<n>] [--only=<url>]
-  [--base-url=<url>] [--skip-fonts] [--force] [--format=table|json]`. A CLI process is not a PHP worker, so it suits
+  [--changed-only] [--base-url=<url>] [--skip-fonts] [--force] [--format=table|json]`. A CLI process is not a PHP worker, so it suits
   large sites. `--parallel` is 1 to 6, default 1; only a host with free PHP workers gains from more: above 1 the
   worker probe runs first and the number is capped at the free workers it saw (a line says so).
 - **The abilities**, server-side in steps, only where at least two PHP workers are free (`bse-start-here`).
@@ -135,7 +184,7 @@ page replaced; for GitHub, only that page's changed files are committed.
 |---|---|
 | `wp bricks-static-export status` | the plugin, Bricks and licence state, and whether the export can run |
 | `wp bricks-static-export preflight [--format=table\|json]` | runs and stores the preflight; exit 1 on a blocker |
-| `wp bricks-static-export discover [--format] [--kind=<kind>]` | the job list; kinds page, post, archive, pagination, reveal, 404, sitemap, robots, favicon |
+| `wp bricks-static-export discover [--format] [--kind=<kind>]` | the job list; kinds page, post, archive, pagination, reveal, 404, search, sitemap, robots, favicon |
 | `wp bricks-static-export regenerate-css` | Bricks' CSS files regenerated with Bricks' own generator, then the preflight again |
 | `wp bricks-static-export export-token issue [--ttl=<seconds>]` | prints a new export token once, for a crawl driven from outside the site |
 | `wp bricks-static-export export-token revoke` | revokes it |

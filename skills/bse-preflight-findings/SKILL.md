@@ -77,8 +77,23 @@ the fix names.
   that the static copy shows the unfiltered loop.
 - **`live_search`** (Live search). Live search asks WordPress for results as you type; the export leaves it out. Fix:
   Remove the live search, or replace it with a search service that works from static pages.
-- **`search_forms`** (Search forms). The search form sends its query to WordPress; on the static site a search leads
-  nowhere, so the form is left out. Fix: Remove the search form, or point it at an external search service.
+- **`search_forms`** (Search forms). With **Site search** on, a note: "Search works on the static site: the export
+  builds an index of the pages, shows results as you type and adds a results page. It searches the text of the exported
+  pages, not WordPress." Fix: nothing; a page can stay out of the search from its Page settings in Bricks. With it off,
+  a warning: "Site search is switched off, so the search form is left out of the static site." Fix: Switch on Site
+  search under Export options, or remove the search form.
+- **`redirects`** (Redirects). A note when every redirect carries over: "<n> redirects go into the export (<sources>): a
+  _redirects file for hosts that read one, and a redirect page at each old address for any other host." A
+  warning when some cannot: "<n> redirects go into the export (<sources>); <m> need WordPress to answer and are left
+  out." Each place names the address, its source and why. Fix: Turn the listed ones into plain address-to-address
+  redirects, or set them up on the static host.
+- **`extras`** (Extra pages and files). A warning: lines under Extra pages or Extra files that name nothing the export
+  can add (a page on another site, a missing file, a PHP or dot file, an empty folder, past 5,000 files). Fix: Correct
+  or remove them under Settings, What goes in.
+- **`sitemaps`** (Sitemaps). A note naming who serves the sitemap (an SEO plugin or WordPress): it goes in with the
+  static site's address, entries for pages the export does not have taken out. A warning instead when no address of the
+  static site is set: its links and robots.txt would point at WordPress. Fix: Set the address of the static site under
+  Settings, Address and forms.
 - **`woo_buying`** (Buying on the static site). "The static copy cannot sell: products, the shop and categories keep
   their prices and descriptions, but add-to-cart buttons and forms, quantity fields, the mini cart and the sort menu are
   removed, with the scripts that call the cart." Fix: Keep the shop on WordPress, or leave the shop out of the export

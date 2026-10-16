@@ -6,7 +6,7 @@ plugin that has not shipped.
 
 ## 0.1.0, 2026-10-12
 
-Pre-release, verified up to Bricks Static Export 1.0.0-rc.6. It goes out with Bricks Static Export 1.0.0.
+Pre-release, verified up to Bricks Static Export 1.0.0-rc.7. It goes out with Bricks Static Export 1.0.0.
 
 - First pack: `bse-start-here`, `bse-static-export`, `bse-preflight-findings`, `bse-forms-routes`,
   `bse-github-deploy` and `bse-update`.
@@ -20,3 +20,6 @@ Pre-release, verified up to Bricks Static Export 1.0.0-rc.6. It goes out with Br
 - Brought up to rc.5: the Static Export screen's three tabs and three steps in every skill that names a place on it;
   the download link on the screen's own address, the http:// note, the from-disk link script and the Google hints in
   `bse-static-export`.
+- Brought up to rc.7 (the 1.0 additions, 2026-10-16): updating a page from Bricks and the changed files ZIP, site
+  search, redirects, extra pages and files, SEO plugin sitemaps, redirected pages skipped, in `bse-static-export`; the
+  `search_forms`, `redirects`, `extras` and `sitemaps` rows in `bse-preflight-findings`.
