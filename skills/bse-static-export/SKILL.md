@@ -23,8 +23,9 @@ GitHub and the address of the static site; **3. Export**, the run, its progress 
      an SEO plugin's index (Yoast SEO, Rank Math, SEOPress, All in One SEO, The SEO Framework) or WordPress' own
      `wp-sitemap.xml`, each with its children and stylesheet;
    - with site search on and a Search element on the site, the search results page (`/search/`, or `/site-search/`
-     when the site has a page at `/search/`);
-   - the owner's **Extra pages** (addresses nothing links to), marked `manual`;
+     when the site exports a page, an archive or an Extra page of its own at `/search/`);
+   - the owner's **Extra pages** (addresses nothing links to), marked `manual`; one WordPress answers with a 404 or a
+     redirect is skipped with a run warning, and a file typed there is not a page (it belongs under Extra files);
    - the pagination pages of every paginated loop in Bricks data; a loop in a template is expanded once per post the
      template applies to; a loop inside a component or global element is reported, not expanded;
    - for load more and infinite scroll past 100 items, the extra pages under `/<page>/bse/<loop>/<n>/`;
@@ -89,7 +90,7 @@ Option `bse_static_export`, saved from the screen:
 | What goes in, Redirects | `redirects` | on |
 | What goes in, Leave out (one path per line; a plain path leaves out that page and everything under it; `=/about/` that page only; `*` and `?` match like a shell pattern) | `exclude_patterns` | none |
 | What goes in, Extra pages (addresses of this site nothing links to) | `extra_pages` | none |
-| What goes in, Extra files (files or folders under the install: copied from disk; never PHP, dot files but `.well-known`, the runs folder; at most 5,000) | `extra_files` | none |
+| What goes in, Extra files (files or folders under the install: copied from disk; never PHP, dot files but `.well-known` (whose files may have no extension), the runs folder, the files the export writes itself (`robots.txt`, `favicon.ico`, `index.html`, `404.html`), the whole site, `wp-content` or uploads folder, or a folder closed to visitors by `.htaccess` or `web.config`; at most 5,000) | `extra_files` | none |
 | What goes in, Parallel requests (pages fetched at once, 1 to 6) | `parallel` | 3 |
 | What goes in, Keep files of the last N runs (1 to 10) | `retention_runs` | 3 |
 | Address and forms, Address of the static site (the base URL) | `base_url` | none |
@@ -128,20 +129,25 @@ and the owner did not list.
 
 ## Site search
 
-The Search element (plain or overlay; WordPress' own search form too) works on the static site: results as you type in
-a list under the field, Enter opens the results page with every match, twenty at a time. The index is built from the
-exported singular pages' main text (not archives, headers or footers), about 3 MB at most; accents and case are
-ignored, a `post_type` parameter on the element narrows the results, and on a site in several languages results follow
-the page's language. It works from a folder opened on disk too. Colours: the CSS variables `--bse-search-bg`, `-fg`,
-`-muted`, `-border`, `-hover`, `-mark`.
+The Search element (plain or overlay) works on the static site: results as you type in a list under the field, Enter
+opens the results page with every match, twenty at a time. The index is built from the exported singular pages' main
+text (not archives, headers or footers), about 3 MB of page text up to about 7,500 pages; accents and case are ignored,
+a `post_type` parameter on the element narrows the results, and on a site in several languages results follow the
+page's language. It works from a folder opened on disk too. A search form that is not a Bricks Search element (a
+WordPress widget, a shortcode) gets the script only on a site that also has a Search element, and only on pages where
+one renders. Colours: the CSS variables `--bse-search-bg`, `-fg`, `-muted`, `-border`, `-hover`, `-mark`.
 
 ## Redirects
 
 Redirection (enabled URL redirects), Rank Math (active; exact, starts with, a regex that is a plain prefix), Yoast
-Premium's stored redirects and WordPress' renamed slugs (`_wp_old_slug`) go into `_redirects` (the file several static
-hosts read) and, for every exact old address, a redirect page (any host, and from disk). What a static host cannot do
-(other patterns, contains or ends with, conditions, query strings, 410 or 404 answers) is listed in the preflight row
-`redirects` and the run's warnings, never approximated. A redirect page never replaces a page of the export.
+Premium's stored redirects and WordPress' renamed post slugs (`_wp_old_slug`; WordPress keeps no old address for a
+renamed page) go into `_redirects` (the file several static hosts read) and, for every exact old address that is a
+folder or an `.html` name, a redirect page (any host, and from disk). A prefix redirect has no redirect page: it works
+only on a host that reads `_redirects`, and the preflight row says how many there are. What a static host cannot do
+(other patterns, contains or ends with, conditions, query strings, 410 or 404 answers, a target on another site that
+is not an http or https address) is listed in the preflight row `redirects` and the run's warnings, never approximated. A redirect page
+never replaces a page or a file of the export. On GitHub the export's lines are a marked block in the repository's
+`_redirects`, below the owner's own lines (`bse-github-deploy`).
 
 ## Sitemaps
 
@@ -165,8 +171,16 @@ Re-exports one page and the files it uses, into a copy of the last complete expo
 
 Where it goes, GitHub first: **GitHub: commit the changed files** (picked once GitHub is set up), **ZIP: changed files
 only** (just what the update changed, to unzip over the live copy; when nothing changed there is no ZIP and the screen
-says so), **ZIP: whole site** (the last export with the page replaced). The search index, `_redirects` and sitemaps
-are rebuilt from the whole tree, so they travel in the changed files when they changed.
+says so), **ZIP: whole site** (the last export with the page replaced). The search index and `_redirects` are rebuilt
+from the whole tree, and the sitemaps are fetched from WordPress again and taken down to the pages of the whole tree,
+so they travel in the changed files when they changed.
+
+The copy comes from the newest complete export still on disk (a full export, or a page update copied from one).
+Without one, the update holds that page alone and the window says to run a full export first. When the static site's
+address or the author or date archive switches changed since that export, the update is refused (`bse_settings_changed`):
+run a full export first. A copied page that is now left out, or whose old address now redirects to a page the site
+has (a renamed post), is removed from the copy; GitHub deletes it on the branch. A changed files ZIP cannot remove a
+file: the run's warnings name what to delete on the host by hand (removed pages and old redirect pages).
 
 ## Where an export runs
 

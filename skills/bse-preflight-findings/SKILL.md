@@ -81,19 +81,30 @@ the fix names.
   builds an index of the pages, shows results as you type and adds a results page. It searches the text of the exported
   pages, not WordPress." Fix: nothing; a page can stay out of the search from its Page settings in Bricks. With it off,
   a warning: "Site search is switched off, so the search form is left out of the static site." Fix: Switch on Site
-  search under Export options, or remove the search form.
+  search under Settings, What goes in, or remove the search form.
 - **`redirects`** (Redirects). A note when every redirect carries over: "<n> redirects go into the export (<sources>): a
   _redirects file for hosts that read one, and a redirect page at each old address for any other host." A
   warning when some cannot: "<n> redirects go into the export (<sources>); <m> need WordPress to answer and are left
-  out." Each place names the address, its source and why. Fix: Turn the listed ones into plain address-to-address
-  redirects, or set them up on the static host.
-- **`extras`** (Extra pages and files). A warning: lines under Extra pages or Extra files that name nothing the export
-  can add (a page on another site, a missing file, a PHP or dot file, an empty folder, past 5,000 files). Fix: Correct
-  or remove them under Settings, What goes in.
+  out." Each place names the address, its source and why. Both add, when some redirects cover every address under a
+  prefix: "<k> of them cover every address under a prefix and work only on a host that reads _redirects." (a prefix
+  redirect has no redirect page). Fix: Turn the listed ones into plain address-to-address redirects, or set them up on
+  the static host.
+- **`extras`** (Extra pages and files). A warning: "These lines under Extra pages or Extra files add nothing to the
+  export, or only part of what they name; each one says why." The causes: a page on another site; a page WordPress
+  answers with a 404 or a redirect (asked only when the preflight can reach the site); a file listed under Extra pages
+  (it belongs under Extra files); a missing file, a PHP or dot file, an empty folder; a file the export writes itself
+  (robots.txt, favicon.ico, the home page, the 404 page); the whole site, wp-content or uploads folder (name a folder
+  inside it); a folder closed to visitors (an `.htaccess` that denies access, or a `web.config`), skipped with what is
+  under it; the line where 5,000 files was reached. Fix: Correct or remove them under Settings, What goes in.
 - **`sitemaps`** (Sitemaps). A note naming who serves the sitemap (an SEO plugin or WordPress): it goes in with the
   static site's address, entries for pages the export does not have taken out. A warning instead when no address of the
   static site is set: its links and robots.txt would point at WordPress. Fix: Set the address of the static site under
-  Settings, Address and forms.
+  Settings, Address and forms. A note when the site serves no sitemap: "This site serves no sitemap, so the export has
+  none." Fix: Switch the sitemap on in WordPress or in your SEO plugin if the static site should have one.
+- **`search_engines`** (Search engines). A warning when WordPress is set to discourage search engines: "WordPress is set
+  to discourage search engines, so every exported page asks them not to index it, and the export has no sitemap." (the
+  last part only when no sitemap is served). Fix: If the static site should be found, untick "Discourage search engines
+  from indexing this site" under Settings, Reading before you export.
 - **`woo_buying`** (Buying on the static site). "The static copy cannot sell: products, the shop and categories keep
   their prices and descriptions, but add-to-cart buttons and forms, quantity fields, the mini cart and the sort menu are
   removed, with the scripts that call the cart." Fix: Keep the shop on WordPress, or leave the shop out of the export

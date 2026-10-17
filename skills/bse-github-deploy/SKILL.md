@@ -49,6 +49,11 @@ After the archive is built, the push runs in steps:
 - Files under the folder that the export no longer holds are deleted, except host files a buyer keeps there: the
   `.github/` folder, `CNAME`, `.nojekyll`, `README.md`, `README`, `LICENSE`, `.gitignore`, `.gitattributes`,
   `_redirects`, `_headers` and the hosts' own configuration files. The export overwrites one only when it holds it.
+- `_redirects` is shared. The export's rules are a block from the line `# Bricks Static Export redirects (do not edit
+  this block; the lines above it are yours)` to the end of the file; the buyer's lines above it stay on every push, a
+  `_redirects` without that line keeps all its lines with the block added after them, and when the export has no
+  redirects left (or Redirects is off) the block goes, the file only when nothing else is in it. A page update does this
+  too.
 - Files outside the folder are never touched.
 - A file above 100 MB is skipped with a warning (GitHub refuses it).
 - Rate limits and server errors make the step wait and try again; a refused token stops the run at once.

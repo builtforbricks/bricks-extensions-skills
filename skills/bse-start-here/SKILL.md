@@ -81,8 +81,10 @@ static site: **This WordPress site** (Bricks runs the form actions; WordPress st
 
 ## Honest limits to keep in mind
 
-Not static, whatever the export does (the preflight lists each): query filters, live search, site search, the
-comments form, logins, carts and checkout, and anything that calls `admin-ajax` or the REST API from the page. Load
-more and infinite scroll pre-render up to 100 items per loop. Forms to this WordPress site need WordPress online.
+Not static, whatever the export does (the preflight lists each): query filters, live search, the comments form,
+logins, carts and checkout, and anything that calls `admin-ajax` or the REST API from the page. Load more and infinite
+scroll pre-render up to 100 items per loop. Forms to this WordPress site need WordPress online.
+Site search works for the Bricks Search element; a search form that is not one (a WordPress widget, a shortcode) gets
+the script only on pages where a Search element renders, and the preflight does not list it.
 The plugin's own checks drive the abilities through WordPress' REST routes
 and WP-CLI, not through an MCP client. Check the pack against the plugin with `bse-update`.
